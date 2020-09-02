@@ -1,5 +1,5 @@
 /* eslint-disable no-continue,no-restricted-syntax */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import { EditorState, Editor, DefaultDraftBlockRenderMap } from 'draft-js';
 import { Map } from 'immutable';
@@ -26,7 +26,7 @@ const getDecoratorLength = obj => {
 /**
  * The main editor component
  */
-const PluginEditor = props => {
+const PluginEditor = forwardRef((props, ref) => {
   const resolvePlugins = () => {
     const plugins = props.plugins.slice(0);
     if (props.defaultKeyBindings !== false) {
@@ -66,7 +66,7 @@ const PluginEditor = props => {
     if (readOnly !== state.readOnly) setState({ readOnly });
   };
 
-  const getEditorRef = () => editor;
+  const getEditorRef = () => ref;
 
   // Cycle through the plugins, changing the editor state with what the plugins
   // changed (or didn't)
@@ -94,7 +94,7 @@ const PluginEditor = props => {
   });
 
   useEffect(() => {
-    const plugins = useRef([props, ...resolvePlugins()]);
+    const plugins = [props, ...resolvePlugins()];
 
     plugins.forEach(plugin => {
       if (typeof plugin.initialize !== 'function') return;
@@ -334,10 +334,10 @@ const PluginEditor = props => {
       blockRenderMap={blockRenderMap}
       onChange={onChange}
       editorState={props.editorState}
-      ref={editor}
+      ref={ref}
     />
   );
-};
+});
 
 PluginEditor.defaultProps = {
   defaultBlockRenderMap: true,
